@@ -68,17 +68,17 @@
     - Restart opendistroforelasticsearch
 
 - name: Register installed plugins
-  shell: "{{ opendistroforelasticsearch_plugin_command }} list"
+  command: "{{ opendistroforelasticsearch_plugin_command }} list"
   environment:
     JAVA_HOME: "{{ opendistroforelasticsearch_java_home }}"
   register: shell_output
-  changed_when: False
+  changed_when: false
 
 - name: Create plugins directory
   file:
     path: "{{ opendistroforelasticsearch_plugins_dir }}"
-    # owner: "{{ opendistroforelasticsearch_user }}"
-    # group: "{{ opendistroforelasticsearch_group }}"
+    owner: "{{ opendistroforelasticsearch_user }}"
+    group: "{{ opendistroforelasticsearch_group }}"
     state: directory
 
 - name: Install plugins
@@ -122,12 +122,5 @@
   service:
     name: "{{ opendistroforelasticsearch_service }}"
     state: started
-    enabled: yes
-  register: register_elasticsearch_start
-
-- name: Wait for elasticsearch to start in task
-  wait_for:
-    host: localhost
-    port: "{{ opendistroforelasticsearch_http_port }}"
-  when:
-    - register_elasticsearch_start.changed
+    enabled: true
+  notify: Wait for elasticsearch to start in handler
